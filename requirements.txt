@@ -1,0 +1,5 @@
+Flask
+SpeechRecognition
+TextBlob
+pydub
+gunicorn
