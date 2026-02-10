@@ -15,19 +15,16 @@ def index():
     text = None
 
     if request.method == "POST":
-        if "audio" not in request.files:
-            return render_template("index.html", sentiment=None, text=None)
-
-        file = request.files["audio"]
-
-        if file.filename == "":
-            return render_template("index.html", sentiment=None, text=None)
-
         try:
+            file = request.files.get("audio")
+
+            if not file or file.filename == "":
+                return render_template("index.html", sentiment=None, text=None)
+
             filepath = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filepath)
 
-            # Convert MP3 to WAV if needed
+            # MP3 → WAV conversion
             if filepath.lower().endswith(".mp3"):
                 try:
                     sound = AudioSegment.from_mp3(filepath)
@@ -35,31 +32,29 @@ def index():
                     sound.export(wav_path, format="wav")
                     filepath = wav_path
                 except:
-                    sentiment = "Neutral"
-                    text = None
-                    return render_template("index.html", sentiment=sentiment, text=text)
+                    # If conversion fails → treat as Neutral
+                    return render_template("index.html", sentiment="Neutral", text=None)
 
             r = sr.Recognizer()
 
-            with sr.AudioFile(filepath) as source:
-                audio = r.record(source)
-
             try:
-                text = r.recognize_google(audio)
+                with sr.AudioFile(filepath) as source:
+                    audio = r.record(source)
+                    text = r.recognize_google(audio)
             except:
-                sentiment = "Neutral"
-                text = None
-                return render_template("index.html", sentiment=sentiment, text=text)
+                # If speech not detected → Neutral
+                return render_template("index.html", sentiment="Neutral", text=None)
 
-            # Sentiment logic
-            polarity = TextBlob(text).sentiment.polarity
+            # If text detected → sentiment analysis
+            if text:
+                polarity = TextBlob(text).sentiment.polarity
 
-            if polarity > 0.1:
-                sentiment = "Positive"
-            elif polarity < -0.1:
-                sentiment = "Negative"
-            elif -0.1 <= polarity <= 0.1:
-                sentiment = "Neutral"
+                if polarity > 0.1:
+                    sentiment = "Positive"
+                elif polarity < -0.1:
+                    sentiment = "Negative"
+                else:
+                    sentiment = "Neutral"
             else:
                 sentiment = "Neutral"
 
