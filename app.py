@@ -36,27 +36,31 @@ def index():
 
                 try:
                     text = r.recognize_google(audio)
+
+                    # Sentiment calculation
+                    polarity = TextBlob(text).sentiment.polarity
+
+                    if polarity > 0.1:
+                        sentiment = "Positive"
+                    elif polarity < -0.1:
+                        sentiment = "Negative"
+                    else:
+                        sentiment = "Neutral"
+
                 except sr.UnknownValueError:
-                    text = "Could not understand the audio clearly."
-                except sr.RequestError:
-                    text = "Speech recognition service unavailable."
-
-                # Sentiment calculation (same logic as before)
-                polarity = TextBlob(text).sentiment.polarity
-
-                if polarity > 0:
-                    sentiment = "Positive"
-                elif polarity < -0.1:
-                    sentiment = "Negative"
-                else:
+                    # If speech not clear → treat as Neutral
                     sentiment = "Neutral"
+                    text = None
+
+                except sr.RequestError:
+                    sentiment = "Neutral"
+                    text = None
 
         except Exception:
-            text = "Error processing the audio file."
-            sentiment = None
+            sentiment = "Neutral"
+            text = None
 
     return render_template("index.html", sentiment=sentiment, text=text)
 
 if __name__ == "__main__":
     app.run()
-
