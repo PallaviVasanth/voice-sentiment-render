@@ -64,12 +64,17 @@
         <button type="submit">Analyze</button>
     </form>
 
+    {% if sentiment %}
     {% if text %}
         <h3>Detected Text:</h3>
         <p>{{ text }}</p>
+    {% endif %}
 
         <h3>Sentiment:</h3>
         <p>{{ sentiment }}</p>
     {% endif %}
+
+
+   
 </body>
 </html>
