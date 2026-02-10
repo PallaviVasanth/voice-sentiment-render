@@ -15,50 +15,82 @@ def index():
     text = None
 
     if request.method == "POST":
-        try:
-            file = request.files.get("audio")
+        file = request.files["audio"]
 
-            if file and file.filename != "":
-                filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-                file.save(filepath)
+        if file:
+            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(filepath)
 
-                # Convert MP3 to WAV if needed
-                if filepath.lower().endswith(".mp3"):
-                    sound = AudioSegment.from_mp3(filepath)
-                    wav_path = filepath.replace(".mp3", ".wav")
-                    sound.export(wav_path, format="wav")
-                    filepath = wav_path
+            # Convert MP3 to WAV if needed
+            if filepath.endswith(".mp3"):
+                sound = AudioSegment.from_mp3(filepath)
+                wav_path = filepath.replace(".mp3", ".wav")
+                sound.export(wav_path, format="wav")
+                filepath = wav_path
 
-                r = sr.Recognizer()
+            r = sr.Recognizer()
 
-                with sr.AudioFile(filepath) as source:
-                    audio = r.record(source)
+            with sr.AudioFile(filepath) as source:
+                audio = r.record(source)
+                text = r.recognize_google(audio)
 
-                try:
-                    text = r.recognize_google(audio)
+            polarity = TextBlob(text).sentiment.polarity
 
-                    # Sentiment calculation
-                    polarity = TextBlob(text).sentiment.polarity
+            if polarity > 0:
+                sentiment = "Positive"
+            elif polarity < 0:
+                sentiment = "Negative"
+            else:
+                sentiment = "Neutral"
 
-                    if polarity > 0.1:
-                        sentiment = "Positive"
-                    elif polarity < -0.1:
-                        sentiment = "Negative"
-                    else:
-                        sentiment = "Neutral"
+    return render_template("index.html", sentiment=sentiment, text=text)
 
-                except sr.UnknownValueError:
-                    # If speech not clear → treat as Neutral
-                    sentiment = "Neutral"
-                    text = None
+if __name__ == "__main__":
+    app.run()
+from flask import Flask, render_template, request
+import os
+import speech_recognition as sr
+from textblob import TextBlob
+from pydub import AudioSegment
 
-                except sr.RequestError:
-                    sentiment = "Neutral"
-                    text = None
+app = Flask(__name__)
 
-        except Exception:
-            sentiment = "Neutral"
-            text = None
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    sentiment = None
+    text = None
+
+    if request.method == "POST":
+        file = request.files["audio"]
+
+        if file:
+            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(filepath)
+
+            # Convert MP3 to WAV if needed
+            if filepath.endswith(".mp3"):
+                sound = AudioSegment.from_mp3(filepath)
+                wav_path = filepath.replace(".mp3", ".wav")
+                sound.export(wav_path, format="wav")
+                filepath = wav_path
+
+            r = sr.Recognizer()
+
+            with sr.AudioFile(filepath) as source:
+                audio = r.record(source)
+                text = r.recognize_google(audio)
+
+            polarity = TextBlob(text).sentiment.polarity
+
+            if polarity > 0:
+                sentiment = "Positive"
+            elif polarity < 0:
+                sentiment = "Negative"
+            else:
+                sentiment = "Neutral"
 
     return render_template("index.html", sentiment=sentiment, text=text)
 
