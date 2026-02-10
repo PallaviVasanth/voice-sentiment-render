@@ -15,9 +15,15 @@ def index():
     text = None
 
     if request.method == "POST":
-        file = request.files.get("audio")
+        if "audio" not in request.files:
+            return render_template("index.html", sentiment=None, text=None)
 
-        if file and file.filename != "":
+        file = request.files["audio"]
+
+        if file.filename == "":
+            return render_template("index.html", sentiment=None, text=None)
+
+        try:
             filepath = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filepath)
 
@@ -29,35 +35,37 @@ def index():
                     sound.export(wav_path, format="wav")
                     filepath = wav_path
                 except:
-                    sentiment = "No Sentiment"
+                    sentiment = "Neutral"
                     text = None
                     return render_template("index.html", sentiment=sentiment, text=text)
 
             r = sr.Recognizer()
 
+            with sr.AudioFile(filepath) as source:
+                audio = r.record(source)
+
             try:
-                with sr.AudioFile(filepath) as source:
-                    audio = r.record(source)
-                    text = r.recognize_google(audio)
+                text = r.recognize_google(audio)
             except:
-                sentiment = "No Sentiment"
+                sentiment = "Neutral"
                 text = None
                 return render_template("index.html", sentiment=sentiment, text=text)
 
-            # Sentiment logic with proper elif chain
-            if text is None or text.strip() == "":
-                sentiment = "No Sentiment"
-            else:
-                polarity = TextBlob(text).sentiment.polarity
+            # Sentiment logic
+            polarity = TextBlob(text).sentiment.polarity
 
-                if polarity > 0.1:
-                    sentiment = "Positive"
-                elif polarity < -0.1:
-                    sentiment = "Negative"
-                elif -0.1 <= polarity <= 0.1:
-                    sentiment = "Neutral"
-                else:
-                    sentiment = "No Sentiment"
+            if polarity > 0.1:
+                sentiment = "Positive"
+            elif polarity < -0.1:
+                sentiment = "Negative"
+            elif -0.1 <= polarity <= 0.1:
+                sentiment = "Neutral"
+            else:
+                sentiment = "Neutral"
+
+        except:
+            sentiment = "Neutral"
+            text = None
 
     return render_template("index.html", sentiment=sentiment, text=text)
 
