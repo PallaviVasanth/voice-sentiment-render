@@ -2,84 +2,21 @@
 <html>
 <head>
     <title>Voice Sentiment Analyzer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            text-align: center;
-            padding-top: 40px;
-        }
-
-        .container {
-            width: 500px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        .upload-box {
-            margin: 20px 0;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .result {
-            margin-top: 25px;
-            padding: 15px;
-            background: #f1f1f1;
-            border-radius: 8px;
-        }
-
-        .positive { color: green; font-weight: bold; }
-        .negative { color: red; font-weight: bold; }
-        .neutral { color: #555; font-weight: bold; }
-    </style>
 </head>
 <body>
+    <h2>Upload MP3 or WAV voice file</h2>
 
-<div class="container">
-    <h1>Voice Sentiment Analyzer</h1>
-    <p>Upload an MP3 or WAV voice file to analyze sentiment</p>
-
-    <form method="POST" enctype="multipart/form-data" class="upload-box">
+    <form method="POST" enctype="multipart/form-data">
         <input type="file" name="audio" required>
-        <br><br>
         <button type="submit">Analyze</button>
     </form>
 
     {% if text %}
-    <div class="result">
-        <h3>Detected Text</h3>
+        <h3>Detected Text:</h3>
         <p>{{ text }}</p>
 
-        <h3>Sentiment Result</h3>
-        {% if sentiment == "Positive" %}
-            <p class="positive">Positive</p>
-        {% elif sentiment == "Negative" %}
-            <p class="negative">Negative</p>
-        {% else %}
-            <p class="neutral">Neutral</p>
-        {% endif %}
-    </div>
+        <h3>Sentiment:</h3>
+        <p>{{ sentiment }}</p>
     {% endif %}
-</div>
-
 </body>
 </html>
