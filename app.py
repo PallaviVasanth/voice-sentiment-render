@@ -49,9 +49,9 @@ def index():
             if text:
                 polarity = TextBlob(text).sentiment.polarity
 
-                if polarity > 0.1:
+                if polarity > 0.2:
                     sentiment = "Positive"
-                elif polarity < -0.1:
+                elif polarity < -0.2:
                     sentiment = "Negative"
                 else:
                     sentiment = "Neutral"
@@ -66,3 +66,4 @@ def index():
 
 if __name__ == "__main__":
     app.run()
+
