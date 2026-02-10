@@ -2,21 +2,115 @@
 <html>
 <head>
     <title>Voice Sentiment Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #eef2f3, #8e9eab);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 450px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin: 15px 0;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #43a047;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f4f6f8;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .positive {
+            color: green;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .negative {
+            color: red;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .neutral {
+            color: #555;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Upload MP3 or WAV voice file</h2>
+
+<div class="card">
+    <h1>Voice Sentiment Analyzer</h1>
+    <p>Upload an MP3 or WAV voice recording to detect sentiment</p>
 
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="audio" required>
-        <button type="submit">Analyze</button>
+        <br>
+        <button type="submit">Analyze Voice</button>
     </form>
 
     {% if text %}
-        <h3>Detected Text:</h3>
+    <div class="result-box">
+        <div class="label">Detected Text:</div>
         <p>{{ text }}</p>
 
-        <h3>Sentiment:</h3>
-        <p>{{ sentiment }}</p>
+        <div class="label">Sentiment Result:</div>
+
+        {% if sentiment == "Positive" %}
+            <div class="positive">Positive</div>
+        {% elif sentiment == "Negative" %}
+            <div class="negative">Negative</div>
+        {% else %}
+            <div class="neutral">Neutral</div>
+        {% endif %}
+    </div>
     {% endif %}
+</div>
+
 </body>
 </html>
