@@ -3,3 +3,6 @@ SpeechRecognition
 TextBlob
 pydub
 gunicorn
+librosa
+numpy
+vaderSentiment
