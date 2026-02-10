@@ -46,7 +46,7 @@ def index():
 
                 if polarity > 0:
                     sentiment = "Positive"
-                elif polarity < 0:
+                elif polarity < -0.1:
                     sentiment = "Negative"
                 else:
                     sentiment = "Neutral"
@@ -59,3 +59,4 @@ def index():
 
 if __name__ == "__main__":
     app.run()
+
