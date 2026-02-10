@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Sentiment Analyzer</title>
+</head>
+<body>
+    <h2>Upload MP3 or WAV voice file</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="audio" required>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if text %}
+        <h3>Detected Text:</h3>
+        <p>{{ text }}</p>
+
+        <h3>Sentiment:</h3>
+        <p>{{ sentiment }}</p>
+    {% endif %}
+</body>
+</html>
